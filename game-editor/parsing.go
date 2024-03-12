@@ -43,7 +43,7 @@ func (a *App) ParsePokemonData() []PokemonTrainerEditor {
 	if err != nil {
 		panic(err)
 	}
-	CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/front/90_front.png", a.dataDirectory.DataDirectory))
+
 	var trainerEditorPokemons []PokemonTrainerEditor
 
 	for pokemon := range pokemons.Pokemon {
@@ -63,7 +63,7 @@ func (a *App) ParsePokemonData() []PokemonTrainerEditor {
 					BackSprite:  CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/back/%s_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ShinyFront:  CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyfront/%s_front_shiny.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ShinyBack:   CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyback/%s_shiny_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
-					Icon:        CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
+					Icon:        CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s/%s.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ID:          pokemons.Pokemon[pokemon].Evolutions[evolution].ID,
 				}
 				evolutions = append(evolutions, evolutionData)
@@ -76,7 +76,7 @@ func (a *App) ParsePokemonData() []PokemonTrainerEditor {
 					BackSprite:  CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/back/%s_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ShinyFront:  CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyfront/%s_front_shiny.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ShinyBack:   CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyback/%s_shiny_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
-					Icon:        CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
+					Icon:        CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s/%s.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].Evolutions[evolution].ID, pokemons.Pokemon[pokemon].Evolutions[evolution].ID)),
 					ID:          pokemons.Pokemon[pokemon].Evolutions[evolution].ID,
 				}
 				evolutions = append(evolutions, evolutionData)
@@ -88,7 +88,7 @@ func (a *App) ParsePokemonData() []PokemonTrainerEditor {
 			BackSprite:     CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/back/%s_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].ID)),
 			ShinyFront:     CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyfront/%s_front_shiny.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].ID)),
 			ShinyBack:      CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/shinyback/%s_shiny_back.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].ID)),
-			Icon:           CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s.png", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].ID)),
+			Icon:           CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s/%s.gif", a.dataDirectory.DataDirectory, pokemons.Pokemon[pokemon].ID, pokemons.Pokemon[pokemon].ID)),
 			HP:             pokemons.Pokemon[pokemon].Stats.Hp,
 			Defense:        pokemons.Pokemon[pokemon].Stats.Defense,
 			SpecialAttack:  pokemons.Pokemon[pokemon].Stats.SpecialAttack,
@@ -177,7 +177,7 @@ func (a *App) SetDataFolder() {
 	a.dataDirectory, _ = SetupConfig()
 }
 
-func (a *App) ParseTrainers() Models.TrainerToml {
+func (a *App) ParseTrainers() []TrainerJson {
 	file, err := os.Open(fmt.Sprintf("%s/data/toml/trainers.toml", a.dataDirectory.DataDirectory))
 	if err != nil {
 		panic(err)
@@ -192,8 +192,35 @@ func (a *App) ParseTrainers() Models.TrainerToml {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(trainers)
-	return trainers
+	var trainersData []TrainerJson
+	for trainer := range trainers.Trainers {
+		var pokemons []PokemonJson
+		for pokemon := range trainers.Trainers[trainer].Pokemons {
+			pokemonData := PokemonJson{
+				Species:        trainers.Trainers[trainer].Pokemons[pokemon].Species,
+				HP:             trainers.Trainers[trainer].Pokemons[pokemon].HP,
+				Speed:          trainers.Trainers[trainer].Pokemons[pokemon].Speed,
+				SpecialAttack:  trainers.Trainers[trainer].Pokemons[pokemon].SpecialAttack,
+				SpecialDefense: trainers.Trainers[trainer].Pokemons[pokemon].SpecialDefense,
+				Attack:         trainers.Trainers[trainer].Pokemons[pokemon].Attack,
+				Defense:        trainers.Trainers[trainer].Pokemons[pokemon].Defense,
+				Front:          CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/front/%s_front.png", a.dataDirectory.DataDirectory, trainers.Trainers[trainer].Pokemons[pokemon].ID)),
+				ID:             trainers.Trainers[trainer].Pokemons[pokemon].ID,
+				Icon:           CreateBase64Image(fmt.Sprintf("%s/data/assets/pokemon/icons/%s/%s.gif", a.dataDirectory.DataDirectory, trainers.Trainers[trainer].Pokemons[pokemon].ID, trainers.Trainers[trainer].Pokemons[pokemon].ID)),
+			}
+			pokemons = append(pokemons, pokemonData)
+
+		}
+		trainerData := TrainerJson{
+			Name:      trainers.Trainers[trainer].Name,
+			Sprite:    CreateBase64Image(fmt.Sprintf("%s/data/assets/trainers_sprite/%s", a.dataDirectory.DataDirectory, trainers.Trainers[trainer].Sprite)),
+			Id:        trainers.Trainers[trainer].ID,
+			ClassType: trainers.Trainers[trainer].ClassType,
+			Pokemons:  pokemons,
+		}
+		trainersData = append(trainersData, trainerData)
+	}
+	return trainersData
 }
 
 func (a *App) GrabTrainerSprites() []TrainerSprite {
@@ -205,9 +232,30 @@ func (a *App) GrabTrainerSprites() []TrainerSprite {
 	for _, sprite := range trainerSprites {
 		trainerSprites := TrainerSprite{
 			Name: sprite.Name(),
-			Path: fmt.Sprintf("%s/data/assets/trainers_sprite/%s", a.dataDirectory.DataDirectory, sprite.Name()),
+			Path: CreateBase64Image(fmt.Sprintf("%s/data/assets/trainers_sprite/%s", a.dataDirectory.DataDirectory, sprite.Name())),
 		}
 		trainerSpritesResult = append(trainerSpritesResult, trainerSprites)
 	}
 	return trainerSpritesResult
+}
+
+func (a *App) GrabAllMoves() Models.AllMoves {
+	movesFileName := fmt.Sprintf("%s/data/toml/moves.toml", a.dataDirectory.DataDirectory)
+	fmt.Print(movesFileName)
+	moves, err := os.Open(movesFileName)
+	if err != nil {
+		fmt.Printf("Error is %v", err)
+	}
+	defer moves.Close()
+	var movesData Models.AllMoves
+	b, err := io.ReadAll(moves)
+	if err != nil {
+		panic(fmt.Errorf("error is %v", err))
+	}
+
+	err = toml.Unmarshal(b, &movesData)
+	if err != nil {
+		panic(err)
+	}
+	return movesData
 }

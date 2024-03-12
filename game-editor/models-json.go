@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/zenith110/pokemon-go-engine/models"
-	Models "github.com/zenith110/pokemon-go-engine/models"
 )
 
 type PokemonJson struct {
@@ -17,6 +16,8 @@ type PokemonJson struct {
 	Moves          []string `json:"moves"`
 	HeldItem       string   `json:"heldItem"`
 	ID             string   `json:"id"`
+	Front          string   `json:"front"`
+	Icon           string   `json:"icon"`
 }
 
 type TrainerJson struct {
@@ -24,7 +25,7 @@ type TrainerJson struct {
 	Sprite    string        `json:"sprite"`
 	Id        string        `json:"id"`
 	Pokemons  []PokemonJson `json:"pokemons"`
-	ClassType string        `toml:"classType"`
+	ClassType string        `json:"classType"`
 }
 
 type OptionsConfig struct {
@@ -54,7 +55,7 @@ type PokemonTrainerEditor struct {
 	Speed          int
 	SpecialDefense int
 	Attack         int
-	Moves          []Models.Moves
+	Moves          []models.Moves
 	ID             string
 	Abilities      []models.Abilities
 	Evolutions     []Evolution
@@ -68,4 +69,22 @@ type HeldItem struct {
 type TrainerSprite struct {
 	Name string
 	Path string
+}
+
+type MapInput struct {
+	Name            string
+	XAxisMax        int
+	YAxisMax        int
+	TilesetLocation string
+}
+
+type MapOutput struct {
+	Name            string `toml:"name"`
+	XAxisMax        int    `toml:"xaxismax"`
+	YAxisMax        int    `toml:"yaxismax"`
+	TilesetLocation string `toml:"tilesetlocation"`
+}
+
+type MapData struct {
+	Map []MapOutput `toml:"map"`
 }
